@@ -6,11 +6,13 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "test": "node index.js https://httpbin.org/json",
-    "dev": "node --watch index.js"
+    "start:example": "node index.js http://localhost:3000/api/news",
+    "dev": "node --watch index.js",
+    "serve:example": "node example/server.js"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "express": "^4.18.2"
   },
   "keywords": ["monitor", "news", "api"],
   "author": "",

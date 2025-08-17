@@ -32,9 +32,9 @@ npm start
 node index.js https://your-api-endpoint.com/api/news
 ```
 
-### Test with a sample API:
+### Start with example server:
 ```bash
-npm run test
+npm run start:example
 ```
 
 ### Development mode (with auto-restart):
@@ -57,8 +57,8 @@ node index.js
 # Use custom URL
 node index.js https://api.example.com/news
 
-# Use test URL
-npm run test
+# Use example server
+npm run start:example
 ```
 
 ## File Tracking
@@ -138,5 +138,6 @@ When new items are detected, you'll see a prominent alert box like:
 ║                        🚨 ALERT! 🚨                        ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                    NEW ITEMS DETECTED! 🎉                   ║
+║
 ╚══════════════════════════════════════════════════════════════╝
 ```
