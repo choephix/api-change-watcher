@@ -10,7 +10,7 @@ const REQUEST_BODY = { reception: "garden" };
 
 // File tracking configuration
 const DATA_DIR = 'data';
-const getDataFileName = (timestamp) => `news_${timestamp.replace(/[:.]/g, '-')}.json`;
+const DATA_FILE = 'latest_news.json';
 
 // State tracking
 let lastSeenId = null;
@@ -53,18 +53,17 @@ const saveToFile = (data, timestamp) => {
       mkdirSync(DATA_DIR, { recursive: true });
     }
 
-    const fileName = getDataFileName(timestamp);
-    const filePath = join(DATA_DIR, fileName);
+    const filePath = join(DATA_DIR, DATA_FILE);
     
     const fileData = {
-      timestamp,
+      lastUpdated: timestamp,
       apiUrl: API_URL,
       fetchCount: data.length,
       news: data
     };
 
     writeFileSync(filePath, JSON.stringify(fileData, null, 2), 'utf8');
-    log(`💾 Saved fetch result to ${fileName}`, 'cyan');
+    log(`💾 Updated ${DATA_FILE}`, 'cyan');
   } catch (error) {
     log(`❌ Error saving to file: ${error.message}`, 'red');
   }
@@ -104,7 +103,7 @@ const checkForNewItems = async () => {
   const timestamp = new Date().toISOString();
   const news = await fetchNews();
   
-  // Save every fetch result to file
+  // Save every fetch result to file (overwriting the same file)
   saveToFile(news, timestamp);
   
   if (news.length === 0) {
@@ -155,7 +154,7 @@ const startMonitoring = () => {
   log('🔍 Starting uslugi.io news monitor...', 'cyan');
   log(`⏰ Checking every ${CHECK_INTERVAL / 1000} seconds`, 'blue');
   log(`🌐 API endpoint: ${API_URL}`, 'blue');
-  log(`📁 Data will be saved to ${DATA_DIR}/ directory`, 'blue');
+  log(`📁 Data will be saved to ${DATA_DIR}/${DATA_FILE}`, 'blue');
   
   if (args.length > 0) {
     log(`📝 Using custom URL from command line arguments`, 'yellow');

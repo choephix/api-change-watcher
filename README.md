@@ -11,7 +11,7 @@ A Node.js application that monitors the uslugi.io news API every 10 seconds and 
 - 📱 Graceful shutdown handling
 - ⚡ Real-time monitoring with detailed logging
 - 🔧 **Flexible URL configuration** via command line arguments
-- 💾 **File tracking** - saves every fetch result to timestamped JSON files
+- 💾 **File tracking** - saves latest fetch result to a single JSON file
 
 ## Installation
 
@@ -63,21 +63,21 @@ npm run test
 
 ## File Tracking
 
-Every API fetch result is automatically saved to a timestamped JSON file in the `data/` directory. This allows you to:
+Every API fetch result is automatically saved to a single JSON file (`data/latest_news.json`), overwriting the previous data. This allows you to:
 
-- 📈 **Track changes over time** - see how the news feed evolves
-- 🔍 **Analyze patterns** - identify when new items typically appear
-- 📊 **Audit history** - review what was available at any given time
-- 💾 **Backup data** - keep a local copy of all fetched data
+- 📈 **Track current state** - always see the latest news data
+- 🔍 **Monitor changes** - see when the file was last updated
+- 📊 **Quick access** - single file to check current news status
+- 💾 **Version control** - track changes in your git repository
 
 ### File Structure
 
-Files are saved as: `data/news_YYYY-MM-DDTHH-MM-SS-sssZ.json`
+The app maintains a single file: `data/latest_news.json`
 
-Each file contains:
+Each update overwrites the file with:
 ```json
 {
-  "timestamp": "2025-01-27T10:30:00.000Z",
+  "lastUpdated": "2025-01-27T10:30:00.000Z",
   "apiUrl": "https://dg.uslugi.io/lv/api/news",
   "fetchCount": 13,
   "news": [
@@ -93,13 +93,13 @@ Each file contains:
 
 ### Data Directory
 
-The app automatically creates a `data/` directory in your project folder. Each fetch creates a new file, so you'll have a complete history of all API calls.
+The app automatically creates a `data/` directory in your project folder. The `latest_news.json` file is continuously updated with each fetch, so you always have the most current data.
 
 ## How it works
 
 1. **Initialization**: On first run, the app records the current latest news item ID and total count
 2. **Monitoring**: Every 10 seconds, it fetches the latest news from the API
-3. **File Saving**: Each fetch result is saved to a timestamped JSON file
+3. **File Saving**: Each fetch result overwrites the `latest_news.json` file
 4. **Detection**: Compares the latest ID with the previously seen ID
 5. **Alerting**: When new items are found, displays a prominent console alert with details
 6. **Tracking**: Updates the tracking state to monitor for future changes
@@ -115,8 +115,8 @@ The app automatically creates a `data/` directory in your project folder. Each f
 - ❌ **Red**: Errors
 - 🔍 **Cyan**: Startup information
 - 📝 **Yellow**: Custom URL usage notification
-- 💾 **Cyan**: File save confirmations
-- 📁 **Blue**: Data directory information
+- 💾 **Cyan**: File update confirmations
+- 📁 **Blue**: Data file information
 
 ## API Details
 
