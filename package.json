@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js https://dg.uslugi.io/lv/api/news",
     "start:example": "node index.js http://localhost:3000/api/news",
     "dev": "node --watch index.js",
     "serve:example": "node example/server.js"
@@ -15,7 +15,13 @@
     "express": "^4.18.2",
     "dotenv": "^16.3.1"
   },
-  "keywords": ["monitor", "news", "api", "webhook", "ifttt"],
+  "keywords": [
+    "monitor",
+    "news",
+    "api",
+    "webhook",
+    "ifttt"
+  ],
   "author": "",
   "license": "MIT"
 }

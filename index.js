@@ -8,9 +8,13 @@ dotenv.config();
 
 // Configuration - URL from command line args or default
 const args = process.argv.slice(2);
-const API_URL = args[0] || 'https://dg.uslugi.io/lv/api/news';
+const API_URL = args[0];
 const CHECK_INTERVAL = 10000; // 10 seconds
 const REQUEST_BODY = { reception: "garden" };
+
+if (!API_URL) {
+  throw new Error('API URL is required as the first argument');
+}
 
 // Webhook configuration
 const WEBHOOK_URL = process.env.IFTTT_WEBHOOK_URL;
