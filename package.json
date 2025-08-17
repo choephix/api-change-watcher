@@ -1,0 +1,18 @@
+{
+  "name": "uslugi-watcher",
+  "version": "1.0.0",
+  "description": "Monitor uslugi.io news API for new items",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js https://httpbin.org/json",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "keywords": ["monitor", "news", "api"],
+  "author": "",
+  "license": "MIT"
+}
