@@ -1,10 +1,16 @@
 import fetch from 'node-fetch';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join } from 'path';
 
 // Configuration - URL from command line args or default
 const args = process.argv.slice(2);
 const API_URL = args[0] || 'https://dg.uslugi.io/lv/api/news';
 const CHECK_INTERVAL = 10000; // 10 seconds
 const REQUEST_BODY = { reception: "garden" };
+
+// File tracking configuration
+const DATA_DIR = 'data';
+const getDataFileName = (timestamp) => `news_${timestamp.replace(/[:.]/g, '-')}.json`;
 
 // State tracking
 let lastSeenId = null;
@@ -40,6 +46,30 @@ ${colors.reset}`;
   console.log(alert);
 };
 
+const saveToFile = (data, timestamp) => {
+  try {
+    // Create data directory if it doesn't exist
+    if (!existsSync(DATA_DIR)) {
+      mkdirSync(DATA_DIR, { recursive: true });
+    }
+
+    const fileName = getDataFileName(timestamp);
+    const filePath = join(DATA_DIR, fileName);
+    
+    const fileData = {
+      timestamp,
+      apiUrl: API_URL,
+      fetchCount: data.length,
+      news: data
+    };
+
+    writeFileSync(filePath, JSON.stringify(fileData, null, 2), 'utf8');
+    log(`💾 Saved fetch result to ${fileName}`, 'cyan');
+  } catch (error) {
+    log(`❌ Error saving to file: ${error.message}`, 'red');
+  }
+};
+
 const fetchNews = async () => {
   try {
     const response = await fetch(API_URL, {
@@ -71,7 +101,11 @@ const fetchNews = async () => {
 };
 
 const checkForNewItems = async () => {
+  const timestamp = new Date().toISOString();
   const news = await fetchNews();
+  
+  // Save every fetch result to file
+  saveToFile(news, timestamp);
   
   if (news.length === 0) {
     log('⚠️  No news items received', 'yellow');
@@ -121,6 +155,7 @@ const startMonitoring = () => {
   log('🔍 Starting uslugi.io news monitor...', 'cyan');
   log(`⏰ Checking every ${CHECK_INTERVAL / 1000} seconds`, 'blue');
   log(`🌐 API endpoint: ${API_URL}`, 'blue');
+  log(`📁 Data will be saved to ${DATA_DIR}/ directory`, 'blue');
   
   if (args.length > 0) {
     log(`📝 Using custom URL from command line arguments`, 'yellow');
