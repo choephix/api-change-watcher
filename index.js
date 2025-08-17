@@ -1,12 +1,19 @@
 import fetch from 'node-fetch';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Configuration - URL from command line args or default
 const args = process.argv.slice(2);
 const API_URL = args[0] || 'https://dg.uslugi.io/lv/api/news';
 const CHECK_INTERVAL = 10000; // 10 seconds
 const REQUEST_BODY = { reception: "garden" };
+
+// Webhook configuration
+const WEBHOOK_URL = process.env.IFTTT_WEBHOOK_URL;
 
 // File tracking configuration
 const DATA_DIR = 'data';
@@ -44,6 +51,32 @@ ${colors.red}${colors.bright}
 ╚══════════════════════════════════════════════════════════════╝
 ${colors.reset}`;
   console.log(alert);
+};
+
+const callWebhook = async (newItems, previousCount, currentCount, previousId, currentId) => {
+  try {
+    const webhookData = {
+      value1: `New news items detected!`,
+      value2: `Count: ${previousCount} → ${currentCount} (+${currentCount - previousCount})`,
+      value3: `Latest ID: ${previousId} → ${currentId}`
+    };
+
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookData)
+    });
+
+    if (response.ok) {
+      log(`🌐 Webhook sent successfully`, 'green');
+    } else {
+      log(`⚠️  Webhook failed with status: ${response.status}`, 'yellow');
+    }
+  } catch (error) {
+    log(`❌ Webhook error: ${error.message}`, 'red');
+  }
 };
 
 const saveToFile = (data, timestamp) => {
@@ -139,6 +172,9 @@ const checkForNewItems = async () => {
       newItems.forEach((item, index) => {
         log(`📰 New item ${index + 1}: ${item.title} (ID: ${item.id_news}, Date: ${item.data})`, 'magenta');
       });
+
+      // Call webhook with alert data
+      await callWebhook(newItems, itemsCount, currentItemsCount, lastSeenId, latestId);
     } else {
       log(`🔄 Items reordered - Latest ID changed: ${lastSeenId} → ${latestId}`, 'blue');
     }
@@ -155,6 +191,10 @@ const startMonitoring = () => {
   log(`⏰ Checking every ${CHECK_INTERVAL / 1000} seconds`, 'blue');
   log(`🌐 API endpoint: ${API_URL}`, 'blue');
   log(`📁 Data will be saved to ${DATA_DIR}/${DATA_FILE}`, 'blue');
+  
+  if (WEBHOOK_URL) {
+    log(`🔗 Webhook enabled: ${WEBHOOK_URL}`, 'blue');
+  }
   
   if (args.length > 0) {
     log(`📝 Using custom URL from command line arguments`, 'yellow');

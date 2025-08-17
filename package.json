@@ -12,9 +12,10 @@
   },
   "dependencies": {
     "node-fetch": "^3.3.2",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1"
   },
-  "keywords": ["monitor", "news", "api"],
+  "keywords": ["monitor", "news", "api", "webhook", "ifttt"],
   "author": "",
   "license": "MIT"
 }

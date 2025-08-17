@@ -12,6 +12,7 @@ A Node.js application that monitors the uslugi.io news API every 10 seconds and 
 - ⚡ Real-time monitoring with detailed logging
 - 🔧 **Flexible URL configuration** via command line arguments
 - 💾 **File tracking** - saves latest fetch result to a single JSON file
+- 🔗 **Webhook notifications** - sends alerts to IFTTT or other webhook endpoints
 
 ## Installation
 
@@ -19,6 +20,12 @@ A Node.js application that monitors the uslugi.io news API every 10 seconds and 
 ```bash
 npm install
 ```
+
+2. **Optional**: Configure webhook notifications:
+   ```bash
+   cp env.example .env
+   # Edit .env with your webhook URL
+   ```
 
 ## Usage
 
@@ -61,6 +68,48 @@ node index.js https://api.example.com/news
 npm run start:example
 ```
 
+## Webhook Notifications
+
+The app can send webhook notifications when new items are detected. This is perfect for:
+- 📱 **Push notifications** via IFTTT
+- 💬 **Slack/Discord messages**
+- 📧 **Email alerts**
+- 🔔 **SMS notifications**
+
+### Configuration
+
+Set the `IFTTT_WEBHOOK_URL` environment variable:
+
+```bash
+# Option 1: Environment variable
+export IFTTT_WEBHOOK_URL="https://your-webhook-url.com/endpoint"
+
+# Option 2: .env file
+echo "IFTTT_WEBHOOK_URL=https://your-webhook-url.com/endpoint" > .env
+
+# Option 3: Use default (built-in IFTTT webhook)
+# No configuration needed
+```
+
+### Webhook Data
+
+When new items are detected, the webhook receives:
+
+```json
+{
+  "value1": "New news items detected!",
+  "value2": "Count: 13 → 14 (+1)",
+  "value3": "Latest ID: 130 → 131"
+}
+```
+
+### IFTTT Integration
+
+The default webhook is configured for IFTTT. You can:
+1. **Use the default** - Works out of the box
+2. **Customize** - Set your own webhook URL in `.env`
+3. **Disable** - Set `IFTTT_WEBHOOK_URL=` (empty) to disable
+
 ## File Tracking
 
 Every API fetch result is automatically saved to a single JSON file (`data/latest_news.json`), overwriting the previous data. This allows you to:
@@ -102,7 +151,8 @@ The app automatically creates a `data/` directory in your project folder. The `l
 3. **File Saving**: Each fetch result overwrites the `latest_news.json` file
 4. **Detection**: Compares the latest ID with the previously seen ID
 5. **Alerting**: When new items are found, displays a prominent console alert with details
-6. **Tracking**: Updates the tracking state to monitor for future changes
+6. **Webhook**: Sends notification to configured webhook endpoint
+7. **Tracking**: Updates the tracking state to monitor for future changes
 
 ## Console Output
 
@@ -117,6 +167,8 @@ The app automatically creates a `data/` directory in your project folder. The `l
 - 📝 **Yellow**: Custom URL usage notification
 - 💾 **Cyan**: File update confirmations
 - 📁 **Blue**: Data file information
+- 🔗 **Blue**: Webhook configuration information
+- 🌐 **Green**: Webhook success confirmations
 
 ## API Details
 
@@ -140,4 +192,9 @@ When new items are detected, you'll see a prominent alert box like:
 ║                    NEW ITEMS DETECTED! 🎉                   ║
 ║
 ╚══════════════════════════════════════════════════════════════╝
+```
+
+And webhook confirmation:
+```
+🌐 Webhook sent successfully
 ```
