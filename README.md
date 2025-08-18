@@ -21,6 +21,25 @@ npm install
 
 ## 🔧 Configuration
 
+### Environment Variables
+
+All options can be configured via environment variables or CLI arguments. Environment variables take precedence over defaults but CLI arguments override both.
+
+Create a `.env` file in the project root:
+
+```env
+# Required Configuration
+API_URL=https://dg.uslugi.io/lv/api/news
+ID_FIELD=id_news
+REQUEST_BODY={"reception":"garden"}
+
+# Optional Configuration
+CHECK_INTERVAL=10
+IFTTT_WEBHOOK_URL=https://maker.ifttt.com/trigger/your_webhook/with/key/your_key
+```
+
+**Priority Order**: CLI arguments > Environment variables > Default values
+
 ## 🎯 Usage
 
 ### Basic Command Structure
@@ -41,6 +60,42 @@ node index.js -u <API_URL> -f <ID_FIELD> -b <REQUEST_BODY_JSON> [-w <WEBHOOK_URL
 | `--verbose` | `-v` | ❌ | Enable verbose logging | |
 | `--help` | `-h` | ❌ | Show help information | |
 | `--version` | `-V` | ❌ | Show version | |
+
+## 🚀 Usage Examples
+
+### Using Environment Variables
+
+```bash
+# Set up your .env file with all configuration
+cp .env.example .env
+# Edit .env with your values
+
+# Run with minimal CLI (uses .env for everything)
+node index.js
+
+# Override specific values from CLI
+node index.js -i 30  # Override interval to 30 seconds
+node index.js -w https://custom.webhook.url  # Override webhook URL
+```
+
+### Using CLI Arguments Only
+
+```bash
+# Configure everything via CLI
+node index.js \
+  -u https://api.example.com/news \
+  -f id \
+  -b '{"category":"test"}' \
+  -i 60 \
+  -w https://webhook.url
+```
+
+### Mixed Configuration
+
+```bash
+# Use .env for most settings, override specific ones
+node index.js -i 30 -w https://custom.webhook.url
+```
 
 ## 🌟 Perfect Example: uslugi.io News Monitor
 

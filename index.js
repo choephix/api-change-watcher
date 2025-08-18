@@ -14,11 +14,11 @@ program
   .name('uslugi-watcher')
   .description('Monitor uslugi.io news API for new items')
   .version('1.0.0')
-  .requiredOption('-u, --url <url>', 'API URL to monitor')
-  .requiredOption('-f, --id-field <field>', 'Field name to use for comparing items (e.g., id_news)', 'id_news')
-  .requiredOption('-b, --body <json>', 'Request body as JSON string (e.g., \'{"reception":"garden"}\')')
-  .option('-i, --interval <seconds>', 'Check interval in seconds', '10')
-  .option('-w, --webhook <url>', 'Webhook URL for notifications (e.g., IFTTT webhook)')
+  .requiredOption('-u, --url <url>', 'API URL to monitor').env('API_URL')
+  .requiredOption('-f, --id-field <field>', 'Field name to use for comparing items (e.g., id_news)', 'id_news').env('ID_FIELD')
+  .requiredOption('-b, --body <json>', 'Request body as JSON string (e.g., \'{"reception":"garden"}\')').env('REQUEST_BODY')
+  .option('-i, --interval <seconds>', 'Check interval in seconds', '10').env('CHECK_INTERVAL')
+  .option('-w, --webhook <url>', 'Webhook URL for notifications (e.g., IFTTT webhook)').env('IFTTT_WEBHOOK_URL')
   .option('-v, --verbose', 'Enable verbose logging')
   .helpOption('-h, --help', 'Display help information')
   .parse();
@@ -73,6 +73,11 @@ ${colors.reset}`;
 };
 
 const callWebhook = async (newItems, previousCount, currentCount, previousId, currentId) => {
+  if (!WEBHOOK_URL) {
+    log(`⚠️  No webhook URL configured - skipping notification`, 'yellow');
+    return;
+  }
+
   try {
     const webhookData = {
       value1: `New news items detected!`,
@@ -215,6 +220,9 @@ const startMonitoring = () => {
   
   if (WEBHOOK_URL) {
     log(`🔗 Webhook enabled: ${WEBHOOK_URL}`, 'blue');
+  } else {
+    log(`⚠️  No webhook configured - notifications disabled`, 'yellow');
+    log(`💡 Set IFTTT_WEBHOOK_URL in .env or use --webhook option`, 'yellow');
   }
   
   // Initial check
