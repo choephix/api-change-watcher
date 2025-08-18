@@ -1,18 +1,10 @@
-# Uslugi.io News Watcher
+#  Api Watcher
 
-A Node.js application that monitors the uslugi.io news API every 10 seconds and alerts when new items are found.
+A Node.js application that monitors any JSON API endpoint every 10 seconds and alerts when new items are found.
 
-## Features
+*This project was born out of necessity when I needed to track kindergarten openings on a government website. For some ungodly reason, the system works like this: parents wait in line all night (and often all day the previous day) outside the building to keep their spot. Then everyone manually refreshes the page constantly to know when to go in — and whether there are openings at all. There is no notification system.*
 
-- 🔍 Monitors news API every 10 seconds
-- 📊 Tracks item count and latest item ID
-- 🚨 Big console alerts when new items are detected
-- 🎨 Color-coded console output for easy reading
-- 📱 Graceful shutdown handling
-- ⚡ Real-time monitoring with detailed logging
-- 🔧 **Flexible URL configuration** via command line arguments
-- 💾 **File tracking** - saves latest fetch result to a single JSON file
-- 🔗 **Webhook notifications** - sends alerts to IFTTT or other webhook endpoints
+*This tool does not fix the underlying systemic and bureaucratic issues that force people to queue-camp, but it does eliminate the need for manual checking. By repeatedly polling the website’s API, it tracks when new information appears and alerts me immediately. Now I know as soon as possible when to enter the building — or it’s time to go home.*
 
 ## Installation
 
