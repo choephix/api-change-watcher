@@ -18,6 +18,7 @@ program
   .requiredOption('-f, --id-field <field>', 'Field name to use for comparing items (e.g., id_news)', 'id_news')
   .requiredOption('-b, --body <json>', 'Request body as JSON string (e.g., \'{"reception":"garden"}\')')
   .option('-i, --interval <seconds>', 'Check interval in seconds', '10')
+  .option('-w, --webhook <url>', 'Webhook URL for notifications (e.g., IFTTT webhook)')
   .option('-v, --verbose', 'Enable verbose logging')
   .helpOption('-h, --help', 'Display help information')
   .parse();
@@ -31,7 +32,7 @@ const ID_FIELD = options.idField;
 const REQUEST_BODY = JSON.parse(options.body); // Parse JSON from CLI argument
 
 // Webhook configuration
-const WEBHOOK_URL = process.env.IFTTT_WEBHOOK_URL;
+const WEBHOOK_URL = options.webhook;
 
 // File tracking configuration
 const DATA_DIR = 'data';

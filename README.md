@@ -21,20 +21,12 @@ npm install
 
 ## 🔧 Configuration
 
-### Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-IFTTT_WEBHOOK_URL=https://maker.ifttt.com/trigger/your_webhook/with/key/your_key
-```
-
 ## 🎯 Usage
 
 ### Basic Command Structure
 
 ```bash
-node index.js -u <API_URL> -f <ID_FIELD> -b <REQUEST_BODY_JSON>
+node index.js -u <API_URL> -f <ID_FIELD> -b <REQUEST_BODY_JSON> [-w <WEBHOOK_URL>]
 ```
 
 ### CLI Options
@@ -44,6 +36,7 @@ node index.js -u <API_URL> -f <ID_FIELD> -b <REQUEST_BODY_JSON>
 | `--url` | `-u` | ✅ | API URL to monitor | `https://api.example.com/news` |
 | `--id-field` | `-f` | ✅ | Field name for comparing items | `id_news`, `uuid`, `article_id` |
 | `--body` | `-b` | ✅ | Request body as JSON string | `'{"reception":"garden"}'` |
+| `--webhook` | `-w` | ❌ | Webhook URL for notifications | `https://maker.ifttt.com/trigger/...` |
 | `--interval` | `-i` | ❌ | Check interval in seconds (default: 10) | `30` |
 | `--verbose` | `-v` | ❌ | Enable verbose logging | |
 | `--help` | `-h` | ❌ | Show help information | |
@@ -66,6 +59,14 @@ node index.js \
   -u https://dg.uslugi.io/lv/api/news \
   -f id_news \
   -b '{"reception":"garden"}'
+
+# Start monitoring with webhook notifications
+node index.js \
+  -u https://dg.uslugi.io/lv/api/news \
+  -f id_news \
+  -b '{"reception":"garden"}' \
+  # (optionally add ifttt webhook for realtime alerting)
+  -w https://maker.ifttt.com/trigger/your_webhook/with/key/your_key 
 ```
 
 ### What This Does
@@ -125,6 +126,9 @@ When new items are detected, the tool sends webhook notifications to IFTTT with:
 ```bash
 # Start monitoring uslugi.io news
 npm start
+
+# Start monitoring with webhook notifications
+npm run start:webhook
 
 # Start with custom parameters
 npm run start:example

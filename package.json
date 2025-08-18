@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js -u https://dg.uslugi.io/lv/api/news -f id_news -b '{\"reception\":\"garden\"}'",
+    "start:webhook": "node index.js -u https://dg.uslugi.io/lv/api/news -f id_news -b '{\"reception\":\"garden\"}' -w https://maker.ifttt.com/trigger/your_webhook/with/key/your_key",
     "start:example": "node index.js -u http://localhost:3000/api/news -f id -b '{\"category\":\"test\"}'",
     "dev": "node --watch index.js -u https://dg.uslugi.io/lv/api/news -f id_news -b '{\"reception\":\"garden\"}'",
     "serve:example": "node example/server.js"
