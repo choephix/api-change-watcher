@@ -2,7 +2,7 @@ import express from 'express';
 import readline from 'readline';
 
 const app = express();
-const PORT = 3000;
+const PORT = 2077;
 
 // Dummy news data with same shape as the real API
 let dummyNews = [
