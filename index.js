@@ -2,19 +2,33 @@ import fetch from 'node-fetch';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import dotenv from 'dotenv';
+import { Command } from 'commander';
 
 // Load environment variables from .env file
 dotenv.config();
 
-// Configuration - URL from command line args or default
-const args = process.argv.slice(2);
-const API_URL = args[0];
-const CHECK_INTERVAL = 10000; // 10 seconds
-const REQUEST_BODY = { reception: "garden" };
+// CLI configuration
+const program = new Command();
 
-if (!API_URL) {
-  throw new Error('API URL is required as the first argument');
-}
+program
+  .name('uslugi-watcher')
+  .description('Monitor uslugi.io news API for new items')
+  .version('1.0.0')
+  .requiredOption('-u, --url <url>', 'API URL to monitor')
+  .requiredOption('-f, --id-field <field>', 'Field name to use for comparing items (e.g., id_news)', 'id_news')
+  .requiredOption('-b, --body <json>', 'Request body as JSON string (e.g., \'{"reception":"garden"}\')')
+  .option('-i, --interval <seconds>', 'Check interval in seconds', '10')
+  .option('-v, --verbose', 'Enable verbose logging')
+  .helpOption('-h, --help', 'Display help information')
+  .parse();
+
+const options = program.opts();
+
+// Configuration from CLI options
+const API_URL = options.url;
+const CHECK_INTERVAL = parseInt(options.interval) * 1000; // Convert to milliseconds
+const ID_FIELD = options.idField;
+const REQUEST_BODY = JSON.parse(options.body); // Parse JSON from CLI argument
 
 // Webhook configuration
 const WEBHOOK_URL = process.env.IFTTT_WEBHOOK_URL;
@@ -150,7 +164,7 @@ const checkForNewItems = async () => {
 
   const currentItemsCount = news.length;
   const latestItem = news[0]; // First item is the most recent
-  const latestId = latestItem.id_news;
+  const latestId = latestItem[ID_FIELD];
 
   // First run - just initialize tracking
   if (isFirstRun) {
@@ -174,7 +188,7 @@ const checkForNewItems = async () => {
       // Show details of new items
       const newItems = news.slice(0, newItemsCount);
       newItems.forEach((item, index) => {
-        log(`📰 New item ${index + 1}: ${item.title} (ID: ${item.id_news}, Date: ${item.data})`, 'magenta');
+        log(`📰 New item ${index + 1}: ${item.title} (ID: ${item[ID_FIELD]}, Date: ${item.data})`, 'magenta');
       });
 
       // Call webhook with alert data
@@ -194,14 +208,12 @@ const startMonitoring = () => {
   log('🔍 Starting uslugi.io news monitor...', 'cyan');
   log(`⏰ Checking every ${CHECK_INTERVAL / 1000} seconds`, 'blue');
   log(`🌐 API endpoint: ${API_URL}`, 'blue');
+  log(`🔑 ID field: ${ID_FIELD}`, 'blue');
+  log(`📤 Request body: ${JSON.stringify(REQUEST_BODY)}`, 'blue');
   log(`📁 Data will be saved to ${DATA_DIR}/${DATA_FILE}`, 'blue');
   
   if (WEBHOOK_URL) {
     log(`🔗 Webhook enabled: ${WEBHOOK_URL}`, 'blue');
-  }
-  
-  if (args.length > 0) {
-    log(`📝 Using custom URL from command line arguments`, 'yellow');
   }
   
   // Initial check

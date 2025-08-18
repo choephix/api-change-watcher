@@ -5,15 +5,16 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js https://dg.uslugi.io/lv/api/news",
-    "start:example": "node index.js http://localhost:3000/api/news",
-    "dev": "node --watch index.js",
+    "start": "node index.js -u https://dg.uslugi.io/lv/api/news -f id_news -b '{\"reception\":\"garden\"}'",
+    "start:example": "node index.js -u http://localhost:3000/api/news -f id -b '{\"category\":\"test\"}'",
+    "dev": "node --watch index.js -u https://dg.uslugi.io/lv/api/news -f id_news -b '{\"reception\":\"garden\"}'",
     "serve:example": "node example/server.js"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2",
+    "commander": "^14.0.0",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "dotenv": "^16.3.1"
+    "node-fetch": "^3.3.2"
   },
   "keywords": [
     "monitor",

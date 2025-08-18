@@ -1,192 +1,154 @@
-#  Api Watcher
+# API Change Watcher
 
-A Node.js application that monitors any JSON API endpoint every 10 seconds and alerts when new items are found.
+A robust Node.js tool for monitoring APIs and detecting new items in real-time. Perfect for news feeds, content updates, or any API that returns lists of items.
 
 *This project was born out of necessity when I needed to track kindergarten openings on a government website. For some ungodly reason, the system works like this: parents wait in line all night (and often all day the previous day) outside the building to keep their spot. Then everyone manually refreshes the page constantly to know when to go in — and whether there are openings at all. There is no notification system.*
 
-*This tool does not fix the underlying systemic and bureaucratic issues that force people to queue-camp, but it does eliminate the need for manual checking. By repeatedly polling the website’s API, it tracks when new information appears and alerts me immediately. Now I know as soon as possible when to enter the building — or it’s time to go home.*
+*This tool does not fix the underlying systemic and bureaucratic issues that force people to queue-camp, but it does eliminate the need for manual checking. By repeatedly polling the website's API, it tracks when new information appears and alerts me immediately. Now I know as soon as possible when to enter the building — or it's time to go home.*
 
-## Installation
+## 📋 Prerequisites
 
-1. Install dependencies:
+- Node.js 18+ 
+- npm or yarn
+
+## 🛠️ Installation
+
 ```bash
+git clone <repository-url>
+cd api-change-watcher
 npm install
 ```
 
-2. **Optional**: Configure webhook notifications:
-   ```bash
-   cp env.example .env
-   # Edit .env with your webhook URL
-   ```
+## 🔧 Configuration
 
-## Usage
+### Environment Variables
 
-### Start the monitor with default URL:
-```bash
-npm start
+Create a `.env` file in the project root:
+
+```env
+IFTTT_WEBHOOK_URL=https://maker.ifttt.com/trigger/your_webhook/with/key/your_key
 ```
 
-### Start with custom URL:
-```bash
-node index.js https://your-api-endpoint.com/api/news
-```
+## 🎯 Usage
 
-### Start with example server:
-```bash
-npm run start:example
-```
-
-### Development mode (with auto-restart):
-```bash
-npm run dev
-```
-
-## Command Line Arguments
-
-The app accepts an optional URL as the first command line argument:
-
-- **No arguments**: Uses default URL (`https://dg.uslugi.io/lv/api/news`)
-- **With URL**: Uses the provided URL for monitoring
-
-Examples:
-```bash
-# Use default URL
-node index.js
-
-# Use custom URL
-node index.js https://api.example.com/news
-
-# Use example server
-npm run start:example
-```
-
-## Webhook Notifications
-
-The app can send webhook notifications when new items are detected. This is perfect for:
-- 📱 **Push notifications** via IFTTT
-- 💬 **Slack/Discord messages**
-- 📧 **Email alerts**
-- 🔔 **SMS notifications**
-
-### Configuration
-
-Set the `IFTTT_WEBHOOK_URL` environment variable:
+### Basic Command Structure
 
 ```bash
-# Option 1: Environment variable
-export IFTTT_WEBHOOK_URL="https://your-webhook-url.com/endpoint"
-
-# Option 2: .env file
-echo "IFTTT_WEBHOOK_URL=https://your-webhook-url.com/endpoint" > .env
-
-# Option 3: Use default (built-in IFTTT webhook)
-# No configuration needed
+node index.js -u <API_URL> -f <ID_FIELD> -b <REQUEST_BODY_JSON>
 ```
 
-### Webhook Data
+### CLI Options
 
-When new items are detected, the webhook receives:
+| Option | Short | Required | Description | Example |
+|--------|-------|----------|-------------|---------|
+| `--url` | `-u` | ✅ | API URL to monitor | `https://api.example.com/news` |
+| `--id-field` | `-f` | ✅ | Field name for comparing items | `id_news`, `uuid`, `article_id` |
+| `--body` | `-b` | ✅ | Request body as JSON string | `'{"reception":"garden"}'` |
+| `--interval` | `-i` | ❌ | Check interval in seconds (default: 10) | `30` |
+| `--verbose` | `-v` | ❌ | Enable verbose logging | |
+| `--help` | `-h` | ❌ | Show help information | |
+| `--version` | `-V` | ❌ | Show version | |
+
+## 🌟 Perfect Example: uslugi.io News Monitor
+
+This tool was specifically designed for monitoring the uslugi.io news API. Here's the complete working example:
+
+### Quick Start (Copy & Run)
+
+```bash
+# Clone and setup
+git clone git@github.com:choephix/api-change-watcher.git
+cd api-change-watcher
+npm install
+
+# Start monitoring uslugi.io news (10-second intervals)
+node index.js \
+  -u https://dg.uslugi.io/lv/api/news \
+  -f id_news \
+  -b '{"reception":"garden"}'
+```
+
+### What This Does
+
+1. **Monitors** the uslugi.io news API every 10 seconds
+2. **Detects** new news items by comparing `id_news` field values
+3. **Saves** all data to `data/latest_news.json`
+4. **Sends** webhook notifications when new items are found
+5. **Logs** everything with beautiful, color-coded output
+
+### Expected API Response Format
+
+The tool expects the API to return data in this format:
 
 ```json
 {
-  "value1": "New news items detected!",
-  "value2": "Count: 13 → 14 (+1)",
-  "value3": "Latest ID: 130 → 131"
-}
-```
-
-### IFTTT Integration
-
-The default webhook is configured for IFTTT. You can:
-1. **Use the default** - Works out of the box
-2. **Customize** - Set your own webhook URL in `.env`
-3. **Disable** - Set `IFTTT_WEBHOOK_URL=` (empty) to disable
-
-## File Tracking
-
-Every API fetch result is automatically saved to a single JSON file (`data/latest_news.json`), overwriting the previous data. This allows you to:
-
-- 📈 **Track current state** - always see the latest news data
-- 🔍 **Monitor changes** - see when the file was last updated
-- 📊 **Quick access** - single file to check current news status
-- 💾 **Version control** - track changes in your git repository
-
-### File Structure
-
-The app maintains a single file: `data/latest_news.json`
-
-Each update overwrites the file with:
-```json
-{
-  "lastUpdated": "2025-01-27T10:30:00.000Z",
-  "apiUrl": "https://dg.uslugi.io/lv/api/news",
-  "fetchCount": 13,
   "news": [
     {
-      "id_news": "130",
-      "data": "11.08.2025",
-      "title": "На вниманието на родителите"
+      "id_news": 131,
+      "title": "News Title",
+      "data": "2025-08-18",
+      "content": "News content..."
     }
-    // ... more news items
   ]
 }
 ```
 
-### Data Directory
+### Monitor with Custom Headers
 
-The app automatically creates a `data/` directory in your project folder. The `latest_news.json` file is continuously updated with each fetch, so you always have the most current data.
+The tool uses standard headers, but you can modify the `fetchNews` function in `index.js` to add custom headers if needed.
 
-## How it works
+### Data Files
 
-1. **Initialization**: On first run, the app records the current latest news item ID and total count
-2. **Monitoring**: Every 10 seconds, it fetches the latest news from the API
-3. **File Saving**: Each fetch result overwrites the `latest_news.json` file
-4. **Detection**: Compares the latest ID with the previously seen ID
-5. **Alerting**: When new items are found, displays a prominent console alert with details
-6. **Webhook**: Sends notification to configured webhook endpoint
-7. **Tracking**: Updates the tracking state to monitor for future changes
+All fetched data is saved to `data/latest_news.json` with this structure:
 
-## Console Output
-
-- 🚀 **Green**: Initialization and successful operations
-- ✅ **Green**: No new items found
-- 🚨 **Red**: Big alert box for new items
-- 📊 **Cyan**: Statistics and counts
-- 📰 **Magenta**: New item details
-- ⚠️ **Yellow**: Warnings and reordering events
-- ❌ **Red**: Errors
-- 🔍 **Cyan**: Startup information
-- 📝 **Yellow**: Custom URL usage notification
-- 💾 **Cyan**: File update confirmations
-- 📁 **Blue**: Data file information
-- 🔗 **Blue**: Webhook configuration information
-- 🌐 **Green**: Webhook success confirmations
-
-## API Details
-
-- **Default Endpoint**: `https://dg.uslugi.io/lv/api/news`
-- **Method**: POST
-- **Body**: `{"reception":"garden"}`
-- **Response**: JSON with news array containing `id_news`, `data`, and `title` fields
-
-## Stopping the Monitor
-
-Press `Ctrl+C` to gracefully stop the monitoring process.
-
-## Example Alert Output
-
-When new items are detected, you'll see a prominent alert box like:
-
-```
-╔══════════════════════════════════════════════════════════════╗
-║                        🚨 ALERT! 🚨                        ║
-╠══════════════════════════════════════════════════════════════╣
-║                    NEW ITEMS DETECTED! 🎉                   ║
-║
-╚══════════════════════════════════════════════════════════════╝
+```json
+{
+  "lastUpdated": "2025-08-18T13:29:01.035Z",
+  "apiUrl": "https://dg.uslugi.io/lv/api/news",
+  "fetchCount": 14,
+  "news": [...]
+}
 ```
 
-And webhook confirmation:
+## 🔗 Webhook Integration
+
+When new items are detected, the tool sends webhook notifications to IFTTT with:
+
+- **value1**: Alert message
+- **value2**: Count change information
+- **value3**: ID change details
+
+## 🚦 Scripts
+
+### NPM Scripts
+
+```bash
+# Start monitoring uslugi.io news
+npm start
+
+# Start with custom parameters
+npm run start:example
+
+# Development mode with file watching
+npm run dev
+
+# Start example server (if available)
+npm run serve:example
 ```
-🌐 Webhook sent successfully
+
+### Custom Scripts
+
+You can create your own scripts in `package.json`:
+
+```json
+{
+  "scripts": {
+    "monitor-blog": "node index.js -u https://blog.example.com/api/posts -f post_id -b '{\"status\":\"published\"}' -i 60",
+    "monitor-shop": "node index.js -u https://shop.example.com/api/products -f sku -b '{\"category\":\"electronics\"}' -i 300"
+  }
+}
 ```
+
+## 🛑 Graceful Shutdown
+
+The tool handles `SIGINT` (Ctrl+C) and `SIGTERM` signals gracefully, ensuring clean shutdown.
