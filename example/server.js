@@ -1,5 +1,5 @@
-import express from 'express';
-import readline from 'readline';
+import express from "express";
+import readline from "readline";
 
 const app = express();
 const PORT = 2077;
@@ -7,30 +7,33 @@ const PORT = 2077;
 // Dummy news data with same shape as the real API
 let dummyNews = [
   {
-    "id_news": "130",
-    "data": "11.08.2025",
-    "title": "На вниманието на родителите"
+    id_news: "130",
+    data: "11.08.2025",
+    title: "На вниманието на родителите",
   },
   {
-    "id_news": "129",
-    "data": "28.07.2025",
-    "title": "СВОБОДНИ МЕСТА ЗА ДЕЦА, ПОДЛЕЖАЩИ НА ЗАДЪЛЖИТЕЛНО ПРЕДУЧИЛИЩНО ОБРАЗОВАНИЕ"
+    id_news: "129",
+    data: "28.07.2025",
+    title:
+      "СВОБОДНИ МЕСТА ЗА ДЕЦА, ПОДЛЕЖАЩИ НА ЗАДЪЛЖИТЕЛНО ПРЕДУЧИЛИЩНО ОБРАЗОВАНИЕ",
   },
   {
-    "id_news": "128",
-    "data": "27.06.2025",
-    "title": "На вниманието на родителите"
+    id_news: "128",
+    data: "27.06.2025",
+    title: "На вниманието на родителите",
   },
   {
-    "id_news": "127",
-    "data": "12.05.2025",
-    "title": "Свободни места в общинските детски градини и детски градини с яслени групи"
+    id_news: "127",
+    data: "12.05.2025",
+    title:
+      "Свободни места в общинските детски градини и детски градини с яслени групи",
   },
   {
-    "id_news": "126",
-    "data": "28.04.2025",
-    "title": "Свободни места в общинските детски градини и детски градини с яслени групи 28.04.2025 г."
-  }
+    id_news: "126",
+    data: "28.04.2025",
+    title:
+      "Свободни места в общинските детски градини и детски градини с яслени групи 28.04.2025 г.",
+  },
 ];
 
 let nextId = 131; // Next ID to use
@@ -46,7 +49,7 @@ const sampleTitles = [
   "Обновления в образователната система",
   "Празнични събития в градината",
   "Здравни мерки и препоръки",
-  "Сътрудничество с родителската общност"
+  "Сътрудничество с родителската общност",
 ];
 
 // Sample dates for random generation
@@ -60,18 +63,20 @@ const sampleDates = [
   "15.09.2025",
   "20.09.2025",
   "25.09.2025",
-  "01.10.2025"
+  "01.10.2025",
 ];
 
 // Function to generate random news item
 const generateRandomNews = () => {
-  const randomTitle = sampleTitles[Math.floor(Math.random() * sampleTitles.length)];
-  const randomDate = sampleDates[Math.floor(Math.random() * sampleDates.length)];
-  
+  const randomTitle =
+    sampleTitles[Math.floor(Math.random() * sampleTitles.length)];
+  const randomDate =
+    sampleDates[Math.floor(Math.random() * sampleDates.length)];
+
   return {
-    "id_news": nextId.toString(),
-    "data": randomDate,
-    "title": randomTitle
+    id_news: nextId.toString(),
+    data: randomDate,
+    title: randomTitle,
   };
 };
 
@@ -80,7 +85,7 @@ const addNewsItem = () => {
   const newItem = generateRandomNews();
   dummyNews.unshift(newItem); // Add to beginning (most recent)
   nextId++;
-  
+
   console.log(`\n🚀 Added new news item:`);
   console.log(`   ID: ${newItem.id_news}`);
   console.log(`   Date: ${newItem.data}`);
@@ -92,52 +97,50 @@ const addNewsItem = () => {
 // Setup keypress listener
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
-// Disable line buffering to get immediate keypresses
-process.stdin.setRawMode(true);
-process.stdin.resume();
-process.stdin.setEncoding('utf8');
-
-console.log('🎯 Example News Server Started!');
-console.log('📡 Server running on http://localhost:3000');
-console.log('🔑 Press any key to add a new news item');
-console.log('⏹️  Press Ctrl+C to exit\n');
-
-// Keypress handler
-process.stdin.on('data', (key) => {
-  // Check for Ctrl+C
-  if (key === '\u0003') {
-    console.log('\n🛑 Shutting down server...');
-    process.exit(0);
-  }
-  
-  // Add new news item on any other keypress
+// Use readline for keypress handling instead of raw mode
+rl.on("line", (input) => {
+  // Add new news item on any input
   addNewsItem();
 });
 
+console.log("🎯 Example News Server Started!");
+console.log("📡 Server running on http://localhost:3000");
+console.log("🔑 Press Enter to add a new news item");
+console.log("⏹️  Press Ctrl+C to exit\n");
+
+// Remove the problematic raw mode setup
+// process.stdin.setRawMode(true);
+// process.stdin.resume();
+// process.stdin.setEncoding('utf8');
+
+// Keypress handler - simplified for compatibility
+rl.on("SIGINT", () => {
+  console.log("\n🛑 Shutting down server...");
+  rl.close();
+  process.exit(0);
+});
+
 // API endpoint that matches the real uslugi.io API
-app.post('/api/news', express.json(), (req, res) => {
+app.post("/api/news", express.json(), (req, res) => {
   console.log(`📥 API request received at ${new Date().toISOString()}`);
-  console.log(`   Request body:`, req.body);
-  
-  res.json({
-    news: dummyNews
-  });
+
+  res.json({ news: dummyNews });
 });
 
 // GET endpoint for easy testing
-app.get('/api/news', (req, res) => {
+app.get("/api/news", (req, res) => {
   console.log(`📥 GET request received at ${new Date().toISOString()}`);
-  
+
   res.json({
-    news: dummyNews
+    news: dummyNews,
   });
 });
 
 // Root endpoint with instructions
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
   res.send(`
     <h1>🎯 Example News Server</h1>
     <p>This server provides dummy news data for testing the uslugi-watcher app.</p>
@@ -156,9 +159,13 @@ app.get('/', (req, res) => {
     
     <h2>Latest Items:</h2>
     <ul>
-      ${dummyNews.slice(0, 5).map(item => 
-        `<li><strong>ID ${item.id_news}</strong> (${item.data}): ${item.title}</li>`
-      ).join('')}
+      ${dummyNews
+        .slice(0, 5)
+        .map(
+          (item) =>
+            `<li><strong>ID ${item.id_news}</strong> (${item.data}): ${item.title}</li>`
+        )
+        .join("")}
     </ul>
     
     <p><em>Press any key in the server console to add new items!</em></p>
@@ -173,12 +180,12 @@ app.listen(PORT, () => {
 });
 
 // Handle graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down server...');
+process.on("SIGINT", () => {
+  console.log("\n🛑 Shutting down server...");
   process.exit(0);
 });
 
-process.on('SIGTERM', () => {
-  console.log('\n🛑 Shutting down server...');
+process.on("SIGTERM", () => {
+  console.log("\n🛑 Shutting down server...");
   process.exit(0);
 });

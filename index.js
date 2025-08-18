@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import dotenv from 'dotenv';
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -14,12 +14,12 @@ program
   .name('uslugi-watcher')
   .description('Monitor uslugi.io news API for new items')
   .version('1.0.0')
-  .requiredOption('-u, --url <url>', 'API URL to monitor').env('API_URL')
-  .requiredOption('-f, --id-field <field>', 'Field name to use for comparing items (e.g., id_news)', 'id_news').env('ID_FIELD')
-  .requiredOption('-b, --body <json>', 'Request body as JSON string (e.g., \'{"reception":"garden"}\')').env('REQUEST_BODY')
-  .option('-i, --interval <seconds>', 'Check interval in seconds', '10').env('CHECK_INTERVAL')
-  .option('-w, --webhook <url>', 'Webhook URL for notifications (e.g., IFTTT webhook)').env('IFTTT_WEBHOOK_URL')
-  .option('-v, --verbose', 'Enable verbose logging')
+  .addOption(new Option('-u, --url <url>', 'API URL to monitor').env('API_URL').makeOptionMandatory())
+  .addOption(new Option('-f, --id-field <field>', 'Field name to use for comparing items (e.g., id_news)').env('ID_FIELD').default('id_news').makeOptionMandatory())
+  .addOption(new Option('-b, --body <json>', 'Request body as JSON string (e.g., \'{"reception":"garden"}\')').env('REQUEST_BODY').default('{}'))
+  .addOption(new Option('-i, --interval <seconds>', 'Check interval in seconds').env('CHECK_INTERVAL').default('10'))
+  .addOption(new Option('-w, --webhook <url>', 'Webhook URL for notifications (e.g., IFTTT webhook)').env('IFTTT_WEBHOOK_URL'))
+  .addOption(new Option('-v, --verbose', 'Enable verbose logging'))
   .helpOption('-h, --help', 'Display help information')
   .parse();
 
@@ -120,7 +120,6 @@ const saveToFile = (data, timestamp) => {
     };
 
     writeFileSync(filePath, JSON.stringify(fileData, null, 2), 'utf8');
-    log(`💾 Updated ${DATA_FILE}`, 'cyan');
   } catch (error) {
     log(`❌ Error saving to file: ${error.message}`, 'red');
   }
